@@ -23,9 +23,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void datachanged();
+
 private:
     // Ui::MainWindow *ui;
     bool play_flag;
+
+    bool lock;
 
     QPushButton* media_player_button;
     QPushButton* media_stop_button;
@@ -34,12 +39,13 @@ private:
     QMediaPlayer* media_player;
     QAudioOutput* audio_output;
 
-    QSlider* slider1;
-    QSlider* slider2;
+    QSlider* slider_time;
+    QSlider* slider_volume;
 
     QLabel* time_label;
 
     QString song_name;
     QLabel* name_label;
+    QPushButton* open_music_button;
 };
 #endif // MAINWINDOW_H
