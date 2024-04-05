@@ -7,56 +7,57 @@ MainWindow::MainWindow(QWidget *parent)
     , lock(false)
     , media_player_button(new QPushButton(this))
     , media_stop_button(new QPushButton(this))
+    , media_forward_button(new QPushButton(this))
+    , media_back_button(new QPushButton(this))
     , media_player(new QMediaPlayer(this))
     , audio_output(new QAudioOutput(this))
     , slider_volume(new QSlider(Qt::Orientation::Horizontal, this))
     , slider_time(new QSlider(Qt::Orientation::Horizontal, this))
     , time_label(new QLabel("", this))
     , name_label(new QLabel("", this))
-    , open_music_button(new QPushButton(this))
+    , playlist(new PlayList(this))
 {
-    this->setGeometry(100, 200, 800, 200);
-    this->setFixedSize(800, 200);
+    this->setGeometry(100, 200, 800, 600);
+    this->setFixedSize(800, 600);
 
-    media_player_button->setGeometry(50, 50, 100, 50);
+    media_player_button->setGeometry(50, 50, 50, 50);
     media_player_button->setText("▶");
     media_player_button->setStyleSheet("background-color: dimGray;");
 
-    media_stop_button->setGeometry(200, 50, 100, 50);
+    media_stop_button->setGeometry(125, 50, 50, 50);
     media_stop_button->setStyleSheet("background-color: dimGray;");
     media_stop_button->setText("⏮");
+
+    media_back_button->setGeometry(200, 50, 50, 50);
+    media_back_button->setStyleSheet("background-color: dimGray;");
+    media_back_button->setText("-10");
+
+    media_forward_button->setGeometry(275, 50, 50, 50);
+    media_forward_button->setStyleSheet("background-color: dimGray;");
+    media_forward_button->setText("+10");
 
     slider_volume->setGeometry(600, 100, 150, 50);
     slider_volume->setMaximum(100);
 
     slider_time->setGeometry(50, 140, 600, 50);
 
-    time_label->setGeometry(675, 145, 100, 50);
+    time_label->setGeometry(660, 145, 90, 50);
     time_label->setStyleSheet("background-color: dimGray;");
     time_label->setAlignment(Qt::AlignCenter);
     time_label->setText("00:00");
 
-    name_label->setGeometry(350, 50, 200, 50);
+    name_label->setGeometry(350, 50, 400, 50);
     name_label->setStyleSheet("background-color: dimGray;");
 
     //Open Music window
-    open_music_button->setGeometry(600, 50, 150, 50);
-    open_music_button->setStyleSheet("background-color: dimGray;");
-    open_music_button->setText("Open Songs List");
 
     media_player->setAudioOutput(audio_output);
 
-    path = "/Users/vahe/Downloads/price-of-freedom.mp3";
-
-    media_player->setSource(QUrl(path));
-
     connect(media_player, &QMediaPlayer::metaDataChanged, this, &MainWindow::datachanged);
 
-    QStringList list = path.split("/");
-    song_name = list[list.size() - 1];
-
     name_label->setAlignment(Qt::AlignCenter);
-    name_label->setText(song_name);
+
+    playlist->setGeometry(50, 225, 700, 350);
 
     connect(media_player_button, &QPushButton::clicked, [this](){
         if (!play_flag)
@@ -77,6 +78,14 @@ MainWindow::MainWindow(QWidget *parent)
         media_player->stop();
         media_player_button->setText("▶");
         datachanged();
+    });
+
+    connect(media_back_button, &QPushButton::clicked, [this](){
+        media_player->setPosition(media_player->position() - 10000);
+    });
+
+    connect(media_forward_button, &QPushButton::clicked, [this](){
+        media_player->setPosition(media_player->position() + 10000);
     });
 
     connect(slider_time, &QSlider::valueChanged, [this]() {
@@ -107,6 +116,8 @@ MainWindow::MainWindow(QWidget *parent)
             lock = false;
         }
     });
+
+    connect(playlist, &PlayList::songIsReady, this, &MainWindow::handleSongReady);
 }
 
 MainWindow::~MainWindow()
@@ -124,4 +135,30 @@ void MainWindow::datachanged()
     time_label->setText(timeString);
 
     slider_time->setMaximum(duration);
+}
+
+double MainWindow::percent(int val, double p)
+{
+    return val * 100 / p;
+}
+
+void MainWindow::resizeEvent(QResizeEvent* e)
+{
+}
+
+void MainWindow::handle_next()
+{
+    playlist->setNext();
+}
+
+void MainWindow::handle_prev()
+{
+    playlist->setPrev();
+}
+
+void MainWindow::handleSongReady()
+{
+    media_player->setSource(QUrl(playlist->getSong()));
+    QStringList list = playlist->getSong().split("/");
+    name_label->setText(list[list.size() - 1]);
 }

@@ -8,6 +8,10 @@
 #include <QSlider>
 #include <QLabel>
 #include <QString>
+#include <QResizeEvent>
+#include <QFileDialog>
+#include <QStringList>
+#include "PlayListHeader.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,6 +29,11 @@ public:
 
 private slots:
     void datachanged();
+    void resizeEvent(QResizeEvent* e) override;
+
+    void handle_next();
+    void handle_prev();
+    void handleSongReady();
 
 private:
     // Ui::MainWindow *ui;
@@ -34,8 +43,8 @@ private:
 
     QPushButton* media_player_button;
     QPushButton* media_stop_button;
-
-    QString path;
+    QPushButton* media_forward_button;
+    QPushButton* media_back_button;
     QMediaPlayer* media_player;
     QAudioOutput* audio_output;
 
@@ -44,8 +53,11 @@ private:
 
     QLabel* time_label;
 
-    QString song_name;
     QLabel* name_label;
-    QPushButton* open_music_button;
+
+    PlayList* playlist;
+
+private:
+    double percent(int val, double p);
 };
 #endif // MAINWINDOW_H
