@@ -45,6 +45,8 @@ private:
     QPushButton* media_stop_button;
     QPushButton* media_forward_button;
     QPushButton* media_back_button;
+    QPushButton* next_song_button;
+    QPushButton* prev_song_button;
     QMediaPlayer* media_player;
     QAudioOutput* audio_output;
 

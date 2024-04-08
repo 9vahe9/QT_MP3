@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -9,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
     , media_stop_button(new QPushButton(this))
     , media_forward_button(new QPushButton(this))
     , media_back_button(new QPushButton(this))
+    , next_song_button(new QPushButton(this))
+    , prev_song_button(new QPushButton(this))
     , media_player(new QMediaPlayer(this))
     , audio_output(new QAudioOutput(this))
     , slider_volume(new QSlider(Qt::Orientation::Horizontal, this))
@@ -36,8 +39,26 @@ MainWindow::MainWindow(QWidget *parent)
     media_forward_button->setStyleSheet("background-color: dimGray;");
     media_forward_button->setText("+10");
 
+    prev_song_button->setGeometry(350, 50, 50, 50);
+    prev_song_button->setStyleSheet("background-color: dimGray;");
+    prev_song_button->setText("prev");
+
+    connect(prev_song_button, &QPushButton::clicked, [this](){
+        handle_prev();
+    });
+
+    next_song_button->setGeometry(425, 50, 50, 50);
+    next_song_button->setStyleSheet("background-color: dimGray;");
+    next_song_button->setText("next");
+
+    connect(next_song_button, &QPushButton::clicked, [this](){
+        handle_next();
+    });
+
     slider_volume->setGeometry(600, 100, 150, 50);
     slider_volume->setMaximum(100);
+
+    slider_volume->setValue(50);
 
     slider_time->setGeometry(50, 140, 600, 50);
 
@@ -46,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
     time_label->setAlignment(Qt::AlignCenter);
     time_label->setText("00:00");
 
-    name_label->setGeometry(350, 50, 400, 50);
+    name_label->setGeometry(500, 50, 250, 50);
     name_label->setStyleSheet("background-color: dimGray;");
 
     //Open Music window
@@ -57,10 +78,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     name_label->setAlignment(Qt::AlignCenter);
 
-    playlist->setGeometry(50, 225, 700, 350);
+    playlist->setGeometry(50, 225, 340, 350);
 
     connect(media_player_button, &QPushButton::clicked, [this](){
-        if (!play_flag)
+        if (!play_flag && playlist->getSong() != "")
         {
             media_player->play();
             play_flag = true;
@@ -72,6 +93,10 @@ MainWindow::MainWindow(QWidget *parent)
             play_flag = false;
             media_player_button->setText("▶");
         }
+    });
+
+    connect(media_player, &QMediaPlayer::errorOccurred, [&](QMediaPlayer::Error error) {
+        qDebug() << "Error occurred:" << media_player->errorString();
     });
 
     connect(media_stop_button, &QPushButton::clicked, [this](){
@@ -158,6 +183,7 @@ void MainWindow::handle_prev()
 
 void MainWindow::handleSongReady()
 {
+    media_player_button->setText("▶");
     media_player->setSource(QUrl(playlist->getSong()));
     QStringList list = playlist->getSong().split("/");
     name_label->setText(list[list.size() - 1]);

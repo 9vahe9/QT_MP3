@@ -47,26 +47,30 @@ void PlayList::setNext()
 {
     if (current_song_index + 1 == songs.size())
     {
-        setSong(0);
+        current_song_index = 0;
     }
 
     else
     {
-        setSong(current_song_index + 1);
+        ++current_song_index;
     }
+
+    setSong(current_song_index);
 }
 
 void PlayList::setPrev()
 {
     if (current_song_index == 0)
     {
-        setSong(songs.size() - 1);
+        current_song_index = songs.size() - 1;
     }
 
     else
     {
-        setSong(current_song_index -1);
+        --current_song_index;
     }
+
+    setSong(current_song_index);
 }
 
 QString PlayList::getSong()
