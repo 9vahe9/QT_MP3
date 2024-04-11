@@ -12,13 +12,15 @@ MainWindow::MainWindow(QWidget *parent)
     , media_back_button(new QPushButton(this))
     , next_song_button(new QPushButton(this))
     , prev_song_button(new QPushButton(this))
+    , add_folder_songs(new QPushButton(this))
     , media_player(new QMediaPlayer(this))
     , audio_output(new QAudioOutput(this))
     , slider_volume(new QSlider(Qt::Orientation::Horizontal, this))
     , slider_time(new QSlider(Qt::Orientation::Horizontal, this))
     , time_label(new QLabel("", this))
     , name_label(new QLabel("", this))
-    , playlist(new PlayList(this))
+    , playlist(new PlayListUpgrade(this))
+    , video_widget(new QVideoWidget(this))
 {
     this->setGeometry(100, 200, 800, 600);
     this->setFixedSize(800, 600);
@@ -42,6 +44,16 @@ MainWindow::MainWindow(QWidget *parent)
     prev_song_button->setGeometry(350, 50, 50, 50);
     prev_song_button->setStyleSheet("background-color: dimGray;");
     prev_song_button->setText("prev");
+
+    add_folder_songs->setGeometry(500, 50, 50, 50);
+    add_folder_songs->setStyleSheet("background-color: dimGray;");
+    add_folder_songs->setText("Dir");
+
+    connect(add_folder_songs, &QPushButton::clicked, [this]()
+    {
+        QStringList songs = QFileDialog::getOpenFileNames(nullptr, "Select MP3 and MP4 Files", QDir::homePath(), "MP3 and MP4 files (*.mp3 *.mp4)");
+        playlist->append_songs(songs);
+    });
 
     connect(prev_song_button, &QPushButton::clicked, [this](){
         handle_prev();
@@ -67,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
     time_label->setAlignment(Qt::AlignCenter);
     time_label->setText("00:00");
 
-    name_label->setGeometry(500, 50, 250, 50);
+    name_label->setGeometry(575, 50, 175, 50);
     name_label->setStyleSheet("background-color: dimGray;");
 
     //Open Music window
@@ -81,7 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
     playlist->setGeometry(50, 225, 340, 350);
 
     connect(media_player_button, &QPushButton::clicked, [this](){
-        if (!play_flag && playlist->getSong() != "")
+        if (!play_flag)
         {
             media_player->play();
             play_flag = true;
@@ -93,10 +105,6 @@ MainWindow::MainWindow(QWidget *parent)
             play_flag = false;
             media_player_button->setText("▶");
         }
-    });
-
-    connect(media_player, &QMediaPlayer::errorOccurred, [&](QMediaPlayer::Error error) {
-        qDebug() << "Error occurred:" << media_player->errorString();
     });
 
     connect(media_stop_button, &QPushButton::clicked, [this](){
@@ -142,7 +150,10 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    connect(playlist, &PlayList::songIsReady, this, &MainWindow::handleSongReady);
+    connect(playlist, &QListWidget::currentRowChanged, this, &MainWindow::handleCurrentChanged);
+
+    video_widget->setGeometry(410, 225, 340, 350);
+    media_player->setVideoOutput(video_widget);
 }
 
 MainWindow::~MainWindow()
@@ -181,10 +192,21 @@ void MainWindow::handle_prev()
     playlist->setPrev();
 }
 
-void MainWindow::handleSongReady()
+void MainWindow::handleCurrentChanged(qint64 curr)
 {
     media_player_button->setText("▶");
-    media_player->setSource(QUrl(playlist->getSong()));
-    QStringList list = playlist->getSong().split("/");
+    media_player->setSource(QUrl(playlist->getCurrentSong()));
+
+    if (playlist->getCurrentSong().endsWith(".mp3"))
+    {
+        video_widget->setStyleSheet("background-image: url(\"/Users/vahe/Qt_Projects/MP3_player/picture/gle1.jpeg\");");
+    }
+
+    else
+    {
+        video_widget->setStyleSheet("");
+    }
+
+    QStringList list = playlist->getCurrentSong().split("/");
     name_label->setText(list[list.size() - 1]);
 }

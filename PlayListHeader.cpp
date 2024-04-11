@@ -1,3 +1,4 @@
+/*
 #include "PlayListHeader.h"
 
 PlayList::PlayList(QWidget* parent):
@@ -77,3 +78,4 @@ QString PlayList::getSong()
 {
     return current_song_full_path;
 }
+*/

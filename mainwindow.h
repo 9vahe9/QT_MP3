@@ -11,7 +11,9 @@
 #include <QResizeEvent>
 #include <QFileDialog>
 #include <QStringList>
-#include "PlayListHeader.h"
+#include <QVideoWidget>
+#include <QPixmap>
+#include "playlistupgrade.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -33,7 +35,7 @@ private slots:
 
     void handle_next();
     void handle_prev();
-    void handleSongReady();
+    void handleCurrentChanged(qint64 curr);
 
 private:
     // Ui::MainWindow *ui;
@@ -47,6 +49,7 @@ private:
     QPushButton* media_back_button;
     QPushButton* next_song_button;
     QPushButton* prev_song_button;
+    QPushButton* add_folder_songs;
     QMediaPlayer* media_player;
     QAudioOutput* audio_output;
 
@@ -57,7 +60,9 @@ private:
 
     QLabel* name_label;
 
-    PlayList* playlist;
+    PlayListUpgrade* playlist;
+
+    QVideoWidget* video_widget;
 
 private:
     double percent(int val, double p);
