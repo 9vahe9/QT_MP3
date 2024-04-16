@@ -57,14 +57,15 @@ private:
     QSlider* slider_volume;
 
     QLabel* time_label;
-
     QLabel* name_label;
+
+    QLabel* image_lbl;
 
     PlayListUpgrade* playlist;
 
     QVideoWidget* video_widget;
 
 private:
-    double percent(int val, double p);
+    double p(int val, double p);
 };
 #endif // MAINWINDOW_H

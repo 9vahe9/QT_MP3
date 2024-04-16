@@ -19,33 +19,35 @@ MainWindow::MainWindow(QWidget *parent)
     , slider_time(new QSlider(Qt::Orientation::Horizontal, this))
     , time_label(new QLabel("", this))
     , name_label(new QLabel("", this))
+    , image_lbl(new QLabel(this))
     , playlist(new PlayListUpgrade(this))
     , video_widget(new QVideoWidget(this))
 {
     this->setGeometry(100, 200, 800, 600);
-    this->setFixedSize(800, 600);
+    this->setMinimumWidth(600);
+    this->setMinimumHeight(450);
 
-    media_player_button->setGeometry(50, 50, 50, 50);
+    // media_player_button->setGeometry(50, 50, 50, 50);
     media_player_button->setText("▶");
     media_player_button->setStyleSheet("background-color: dimGray;");
 
-    media_stop_button->setGeometry(125, 50, 50, 50);
+    // media_stop_button->setGeometry(125, 50, 50, 50);
     media_stop_button->setStyleSheet("background-color: dimGray;");
     media_stop_button->setText("⏮");
 
-    media_back_button->setGeometry(200, 50, 50, 50);
+    // media_back_button->setGeometry(200, 50, 50, 50);
     media_back_button->setStyleSheet("background-color: dimGray;");
     media_back_button->setText("-10");
 
-    media_forward_button->setGeometry(275, 50, 50, 50);
+    // media_forward_button->setGeometry(275, 50, 50, 50);
     media_forward_button->setStyleSheet("background-color: dimGray;");
     media_forward_button->setText("+10");
 
-    prev_song_button->setGeometry(350, 50, 50, 50);
+    // prev_song_button->setGeometry(350, 50, 50, 50);
     prev_song_button->setStyleSheet("background-color: dimGray;");
     prev_song_button->setText("prev");
 
-    add_folder_songs->setGeometry(500, 50, 50, 50);
+    // add_folder_songs->setGeometry(500, 50, 50, 50);
     add_folder_songs->setStyleSheet("background-color: dimGray;");
     add_folder_songs->setText("Dir");
 
@@ -59,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
         handle_prev();
     });
 
-    next_song_button->setGeometry(425, 50, 50, 50);
+    // next_song_button->setGeometry(425, 50, 50, 50);
     next_song_button->setStyleSheet("background-color: dimGray;");
     next_song_button->setText("next");
 
@@ -67,19 +69,19 @@ MainWindow::MainWindow(QWidget *parent)
         handle_next();
     });
 
-    slider_volume->setGeometry(600, 100, 150, 50);
+    //slider_volume->setGeometry(600, 100, 150, 50);
     slider_volume->setMaximum(100);
 
     slider_volume->setValue(50);
 
-    slider_time->setGeometry(50, 140, 600, 50);
+    //slider_time->setGeometry(50, 140, 600, 50);
 
-    time_label->setGeometry(660, 145, 90, 50);
+    //time_label->setGeometry(675, 140, 75, 50);
     time_label->setStyleSheet("background-color: dimGray;");
     time_label->setAlignment(Qt::AlignCenter);
     time_label->setText("00:00");
 
-    name_label->setGeometry(575, 50, 175, 50);
+    //name_label->setGeometry(575, 50, 175, 50);
     name_label->setStyleSheet("background-color: dimGray;");
 
     //Open Music window
@@ -90,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     name_label->setAlignment(Qt::AlignCenter);
 
-    playlist->setGeometry(50, 225, 340, 350);
+    //playlist->setGeometry(50, 225, 340, 350);
 
     connect(media_player_button, &QPushButton::clicked, [this](){
         if (!play_flag)
@@ -152,7 +154,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(playlist, &QListWidget::currentRowChanged, this, &MainWindow::handleCurrentChanged);
 
-    video_widget->setGeometry(410, 225, 340, 350);
+    //video_widget->setGeometry(410, 225, 340, 350);
+    //image_lbl->setGeometry(410, 225, 340, 350);
+    QPixmap pixmap("/Users/vahe/Qt_Projects/MP3_player/picture/gle1.png");
+    image_lbl->setPixmap(pixmap);
+    image_lbl->setVisible(true);
+
     media_player->setVideoOutput(video_widget);
 }
 
@@ -173,13 +180,35 @@ void MainWindow::datachanged()
     slider_time->setMaximum(duration);
 }
 
-double MainWindow::percent(int val, double p)
+double MainWindow::p(int val, double p)
 {
-    return val * 100 / p;
+    return val * p / 100;
 }
 
 void MainWindow::resizeEvent(QResizeEvent* e)
 {
+    qint64 w = this->width();
+    qint64 h = this->height();
+
+    //this->setGeometry(100, 200, 800, 600);
+    media_player_button->setGeometry(p(w, 6.25), p(h, 25 / 3), p(w, 6.25), p(h, 25 / 3));
+    media_stop_button->setGeometry(p(w, 15.625), p(h, 25 / 3), p(w, 6.25), p(h, 25 / 3));
+    media_back_button->setGeometry(p(w, 25), p(h, 25 / 3), p(w, 6.25), p(h, 25 / 3));
+    media_forward_button->setGeometry(p(w, 34.375), p(h, 25 / 3), p(w, 6.25), p(h, 25 / 3));
+    prev_song_button->setGeometry(p(w, 43.75), p(h, 25 / 3), p(w, 6.25), p(h, 25 / 3));
+    next_song_button->setGeometry(p(w, 53.125), p(h, 25 / 3), p(w, 6.25), p(h, 25 / 3));
+    add_folder_songs->setGeometry(p(w, 62.5), p(h, 25 / 3), p(w, 6.25), p(h, 25 / 3));
+    name_label->setGeometry(p(w, 71.875), p(h, 25 / 3), p(w, 21.875), p(h, 25 / 3));
+
+    slider_volume->setGeometry(p(w, 71.875), p(h, 50 / 3), p(w, 21.875), p(h, 25 / 3));
+    slider_time->setGeometry(p(w, 6.25), p(h, 70 / 3), p(w, 75), p(h, 25 / 3));
+
+    time_label->setGeometry(p(w, 84.375), p(h, 70 / 3), p(w, 9.375), p(h, 25 / 3));
+
+    playlist->setGeometry(p(w, 6.25), p(h, 112.5 / 3), p(w, 42.5), p(h, 175 / 3));
+
+    video_widget->setGeometry(p(w, 51.25), p(h, 112.5 / 3), p(w, 42.5), p(h, 175 / 3));
+    image_lbl->setGeometry(p(w, 51.25), p(h, 112.5 / 3), p(w, 42.5), p(h, 175 / 3));
 }
 
 void MainWindow::handle_next()
@@ -199,12 +228,14 @@ void MainWindow::handleCurrentChanged(qint64 curr)
 
     if (playlist->getCurrentSong().endsWith(".mp3"))
     {
-        video_widget->setStyleSheet("background-image: url(\"/Users/vahe/Qt_Projects/MP3_player/picture/gle1.jpeg\");");
+        image_lbl->setVisible(true);
+        video_widget->hide();
     }
 
     else
     {
-        video_widget->setStyleSheet("");
+        image_lbl->setVisible(false);
+        video_widget->show();
     }
 
     QStringList list = playlist->getCurrentSong().split("/");
